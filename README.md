@@ -1,6 +1,6 @@
 "# alpha-sniper" 
 
-https://pukkok.github.io/alpah-sniper
+https://pukkok.github.io/alpha-sniper
 
 <div>
     <h2>알파벳 스나이퍼</h>
