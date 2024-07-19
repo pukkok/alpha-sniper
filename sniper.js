@@ -12,8 +12,10 @@ const _alphabets = 'ASDF'.split('')
 const _alphabets2 = 'ZXCV'.split('')
 const _alphabets3 = 'TGBYHN'.split('')
 const _alphabets4 = 'UJMKIOP'.split('')
-const enemies = []
-const enemyRespawnInterval = 2000 // 적 리스폰 시간 (밀리초)
+let enemies = []
+let enemyRespawnInterval = 3000 // 적 리스폰 시간 (밀리초)
+let spawnTimer
+let boardTimer
 let characterMovingAnimationFrame
 let enemyMovingAnimationFrame
 let gamePaused = false
@@ -24,7 +26,7 @@ let gameStarted = false
 let score = 0
 let selectedAlphabet = ''
 let lives = 10
-let stage = 1
+let level = 1
 let startTime = Date.now()
 
 /*******************************************/
@@ -49,6 +51,7 @@ let movePoint = {
 const startBox = document.getElementById('start-box')
 const startButton = document.getElementById('start-button')
 
+// 캐릭터 그리기
 function drawCharacter() {
     ctx.clearRect(0, 0, canvas.width, canvas.height)
     if (movePoint.x !== null && movePoint.y !== null) {
@@ -56,15 +59,17 @@ function drawCharacter() {
     }
     ctx.drawImage(characterImg, character.x - character.width / 2, character.y - character.height / 2, character.width, character.height)
 
+    // 3점 범위
     ctx.beginPath()
     ctx.strokeStyle = 'blue'
-    ctx.arc(character.x, character.y, character.width / 2 + character.range - 30 * (stage-1), 0, 2 * Math.PI)
+    ctx.arc(character.x, character.y, character.width / 2 + character.range - 30 * (level-1), 0, 2 * Math.PI)
     ctx.stroke()
     ctx.closePath()
 
     drawEnemies()
 }
 
+// 움직이는 곳 포인트
 function drawMovePoint() {
     ctx.beginPath()
     ctx.fillStyle = 'yellowgreen'
@@ -85,6 +90,7 @@ function drawMovePoint() {
     ctx.closePath()
 }
 
+// 적 그리기
 function drawEnemies() {
     enemies.forEach(enemy => {
         ctx.fillStyle = 'white'
@@ -124,13 +130,11 @@ function moveEnemies() {
         }
 
         if (distance <= character.width / 2 + enemy.radius) {
-            lives -= 3
+            lives < 3 ? lives = 0 : lives -= 3
             enemies.splice(index, 1) // 적을 제거
             drawBoard()
-            if (lives <= 0) {
-                cancelAnimationFrame(enemyMovingAnimationFrame)
-                cancelAnimationFrame(characterMovingAnimationFrame)
-                alert('Game Over')
+            if (lives === 0) {
+                gameOver()
             }
         }
     })
@@ -207,6 +211,8 @@ function spawnEnemy() {
     enemies.push(newEnemy)
 }
 
+
+
 canvas.addEventListener('contextmenu', (e) => {
     e.preventDefault()
     if (gamePaused || !gameStarted) return;
@@ -227,44 +233,48 @@ canvas.addEventListener('contextmenu', (e) => {
     }
 })
 
+// 캐릭터 로딩 완료
 characterImg.onload = () => {
     drawCharacter()
-    setInterval(spawnEnemy, enemyRespawnInterval)
+    spawnTimer = setInterval(spawnEnemy, enemyRespawnInterval)
+    drawBoard()
 }
 
 const boardCanvas = document.getElementById('board-canvas')
 const boardCtx = boardCanvas.getContext('2d')
 
-boardCanvas.width = window.innerWidth
-boardCanvas.height = window.innerHeight / 100 * 7
+boardCanvas.width = 150
+boardCanvas.height = 180
 
 function drawBoard() {
     boardCtx.clearRect(0, 0, boardCanvas.width, boardCanvas.height)
-    boardCtx.fillStyle = 'black'
     boardCtx.font = '20px noto-sans'
-
-    // 점수, 타겟, 라이프
-    boardCtx.fillText('점수 : ' + score, 20, 40)
-    boardCtx.fillText('타겟 : ' + selectedAlphabet, 200, 40)
-    boardCtx.fillText('라이프 : ' + lives, 400, 40)
-
-    // 정지 버튼 디자인
-    boardCtx.fillStyle = 'red'
-    boardCtx.fillRect(boardCanvas.width - 180, 10, 150, 30)
-    boardCtx.fillStyle = 'white'
-    boardCtx.fillText('정지', boardCanvas.width - 150, 30)
 
     // 타이머 표시
     const elapsedTime = Math.floor((Date.now() - startTime) / 1000)
     const minutes = Math.floor(elapsedTime / 60)
     const seconds = elapsedTime % 60
-    const timeString = `타이머: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`
+    let timeString = `시간 : ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`
+    if(gamePaused) fillStyle = 'white'
     boardCtx.fillStyle = 'black'
-    boardCtx.fillText(timeString, boardCanvas.width - 350, 40)
+    boardCtx.fillText(timeString, 20, 40)
+
+    // 점수, 타겟, 라이프
+    boardCtx.fillStyle = 'black'
+    boardCtx.fillText('점수 : ' + score, 20, 80)
+    boardCtx.fillText('목숨 : ', 20, 120)
+    if(lives >7 && lives <= 10){
+        boardCtx.fillStyle = 'green'
+    }else if(lives > 4 && lives <= 7){
+        boardCtx.fillStyle = 'orange'
+    }else{
+        boardCtx.fillStyle = 'red'
+    }
+    boardCtx.fillText(lives, 80, 120)
+    boardCtx.fillStyle = 'red'
+    boardCtx.fillText('타겟 : ' + selectedAlphabet, 20, 160)
 
 }
-
-drawBoard()
 
 // 클릭 이벤트
 window.addEventListener('keydown', (e) => {
@@ -311,27 +321,36 @@ canvas.addEventListener('click', (e) => {
         const cursorDx = mouseX - character.x
         const cursorDy = mouseY - character.y
 
-        const point = Math.sqrt(cursorDx * cursorDx + cursorDy * cursorDy)
+        const cursorDistance = Math.sqrt(cursorDx * cursorDx + cursorDy * cursorDy)
         
-        const characterRadius = character.width / 2 + character.range - 30 * (stage-1)
+        const characterRadius = character.width / 2 + character.range - 30 * (level-1)
         if (distance <= enemy.radius && !enemy.removing) { // 지워지는 중이 아닌경우
-            // console.log(Math.floor(distance))
+
             enemyClicked = true
             if (enemy.alphabet === selectedAlphabet) {
                 enemy.removing = true
                 enemy.removeStartTime = Date.now()
-                if (point <= characterRadius) {
+                if (cursorDistance <= characterRadius) {
                     score += 3 // 캐릭터의 파란 원 안에서 적을 처치하면 3점
                 } else {
                     score += 1 // 캐릭터의 파란 원 밖에서 적을 처치하면 1점
                 }
 
-                if (score > 10 && stage === 1){
-                    stage = 2
+                if (score > 30 && level === 1){
+                    level = 2
                     alphabets.push(..._alphabets)
-                } else if(score > 30 && stage === 2){
-                    stage = 3
+                } else if(score > 70 && level === 2){
+                    level = 3
                     alphabets.push(..._alphabets2)
+                } else if(score > 100 && level === 3){
+                    level = 4
+                    alphabets.push(..._alphabets3)
+                    enemyRespawnInterval = 2000
+                    spawnTimer = setInterval(spawnEnemy, enemyRespawnInterval)
+                } else if(score > 200 && level === 4){
+                    level = 5
+                    enemyRespawnInterval = 1000
+                    spawnTimer = setInterval(spawnEnemy, enemyRespawnInterval)
                 }
 
             } else {
@@ -342,9 +361,7 @@ canvas.addEventListener('click', (e) => {
                 lives < 2 ? lives = 0 : lives -= 2
                 drawBoard()
                 if (lives === 0) {
-                    cancelAnimationFrame(enemyMovingAnimationFrame)
-                    cancelAnimationFrame(characterMovingAnimationFrame)
-                    alert('Game Over')
+                    gameOver()
                 }
             }
             drawBoard()
@@ -356,10 +373,8 @@ canvas.addEventListener('click', (e) => {
         // 바닥을 클릭한 경우 라이프 1 감소
         lives -= 1
         drawBoard()
-        if (lives <= 0) {
-            cancelAnimationFrame(enemyMovingAnimationFrame)
-            cancelAnimationFrame(characterMovingAnimationFrame)
-            alert('Game Over')
+        if (lives === 0) {
+            gameOver()
         }
     }
 })
@@ -376,17 +391,7 @@ function removeEnemies() {
     })
     requestAnimationFrame(removeEnemies)
 }
-removeEnemies()
 
-startButton.addEventListener('click', () => {
-    startBox.style.display = 'none'
-    gameStarted = true
-    startTime = Date.now()
-    drawCharacter()
-    moveEnemies()
-    setInterval(spawnEnemy, enemyRespawnInterval)
-    drawBoard()
-})
 
 boardCanvas.addEventListener('click', (e) => {
     e.preventDefault()
@@ -405,3 +410,51 @@ boardCanvas.addEventListener('click', (e) => {
         }
     }
 })
+
+// 게임 시작
+startButton.addEventListener('click', () => {
+    startBox.style.display = 'none'
+    if(!gameStarted){
+        reset()
+    }
+    gameStarted = true
+    startTime = Date.now()
+    
+    drawCharacter()
+    moveEnemies()
+    removeEnemies()
+    spawnTimer = setInterval(spawnEnemy, enemyRespawnInterval)
+    boardTimer = setInterval(drawBoard, 1000)
+})
+
+// 게임 패배
+function gameOver () {
+    startBox.style.display = 'block'
+    cancelAnimationFrame(enemyMovingAnimationFrame)
+    cancelAnimationFrame(characterMovingAnimationFrame)
+    alert(`최종 점수 : ${score}`)
+    clearInterval(boardTimer)
+    gameStarted = false
+}
+
+// 초기화
+function reset () {
+    character = {
+        x: canvas.width / 2,
+        y: canvas.height / 2,
+        width: 50,
+        height: 50,
+        speed: 3,
+        range: 350,
+        targetX: null,
+        targetY: null,
+        moving: false
+    }
+    score = 0
+    level = 1
+    lives = 10
+    enemies = []
+    enemyRespawnInterval = 3000
+    startTime = Date.now()
+    
+}
