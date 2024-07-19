@@ -7,7 +7,7 @@ canvas.height = window.innerHeight
 const characterImg = new Image()
 characterImg.src = './public/main.png'
 
-const alphabets = 'QWER'.split('')
+let alphabets = 'QWER'.split('')
 const _alphabets = 'ASDF'.split('')
 const _alphabets2 = 'ZXCV'.split('')
 const _alphabets3 = 'TGBYHN'.split('')
@@ -27,7 +27,7 @@ let score = 0
 let selectedAlphabet = ''
 let lives = 10
 let level = 1
-let startTime = Date.now()
+let stringSec = 0
 
 /*******************************************/
 
@@ -248,15 +248,14 @@ boardCanvas.height = 180
 
 function drawBoard() {
     boardCtx.clearRect(0, 0, boardCanvas.width, boardCanvas.height)
-    boardCtx.font = '20px noto-sans'
+    boardCtx.font = '24px noto-sans'
 
     // 타이머 표시
-    const elapsedTime = Math.floor((Date.now() - startTime) / 1000)
-    const minutes = Math.floor(elapsedTime / 60)
-    const seconds = elapsedTime % 60
+    const minutes = Math.floor(stringSec / 60)
+    const seconds = stringSec % 60
     let timeString = `시간 : ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`
-    if(gamePaused) fillStyle = 'white'
     boardCtx.fillStyle = 'black'
+    if(gamePaused) boardCtx.fillStyle = 'red'
     boardCtx.fillText(timeString, 20, 40)
 
     // 점수, 타겟, 라이프
@@ -270,7 +269,7 @@ function drawBoard() {
     }else{
         boardCtx.fillStyle = 'red'
     }
-    boardCtx.fillText(lives, 80, 120)
+    boardCtx.fillText(lives, 90, 120)
     boardCtx.fillStyle = 'red'
     boardCtx.fillText('타겟 : ' + selectedAlphabet, 20, 160)
 
@@ -424,7 +423,12 @@ startButton.addEventListener('click', () => {
     moveEnemies()
     removeEnemies()
     spawnTimer = setInterval(spawnEnemy, enemyRespawnInterval)
-    boardTimer = setInterval(drawBoard, 1000)
+    boardTimer = setInterval(() => {
+        if(!gamePaused){
+            stringSec++
+        }
+        drawBoard()
+    }, 1000)
 })
 
 // 게임 패배
@@ -454,7 +458,8 @@ function reset () {
     level = 1
     lives = 10
     enemies = []
+    alphabets = 'QWER'.split('')
     enemyRespawnInterval = 3000
-    startTime = Date.now()
+    stringSec = 0
     
 }
