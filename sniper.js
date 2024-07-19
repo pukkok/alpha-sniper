@@ -7,7 +7,11 @@ canvas.height = window.innerHeight
 const characterImg = new Image()
 characterImg.src = './public/main.png'
 
-const alphabets = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
+const alphabets = 'QWER'.split('')
+const _alphabets = 'ASDF'.split('')
+const _alphabets2 = 'ZXCV'.split('')
+const _alphabets3 = 'TGBYHN'.split('')
+const _alphabets4 = 'UJMKIOP'.split('')
 const enemies = []
 const enemyRespawnInterval = 2000 // 적 리스폰 시간 (밀리초)
 let characterMovingAnimationFrame
@@ -24,13 +28,14 @@ let stage = 1
 let startTime = Date.now()
 
 /*******************************************/
+
 let character = {
     x: canvas.width / 2,
     y: canvas.height / 2,
     width: 50,
     height: 50,
     speed: 3,
-    range: 250,
+    range: 350,
     targetX: null,
     targetY: null,
     moving: false
@@ -249,13 +254,19 @@ function drawBoard() {
     boardCtx.fillStyle = 'white'
     boardCtx.fillText('정지', boardCanvas.width - 150, 30)
 
-    // 타이머
-    const playTime = Math.floor((Date.now() - startTime) / 1000)
-    boardCtx.fillText('타이머 : ' + playTime + 's', boardCanvas.width - 350, 40)
+    // 타이머 표시
+    const elapsedTime = Math.floor((Date.now() - startTime) / 1000)
+    const minutes = Math.floor(elapsedTime / 60)
+    const seconds = elapsedTime % 60
+    const timeString = `타이머: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`
+    boardCtx.fillStyle = 'black'
+    boardCtx.fillText(timeString, boardCanvas.width - 350, 40)
+
 }
 
 drawBoard()
 
+// 클릭 이벤트
 window.addEventListener('keydown', (e) => {
     if (alphabets.includes(e.key.toUpperCase())) {
         selectedAlphabet = e.key.toUpperCase()
@@ -280,6 +291,7 @@ window.addEventListener('keydown', (e) => {
     }
 })
 
+// 캔버스 클릭 이벤트(게임 플레이)
 canvas.addEventListener('click', (e) => {
     if (gamePaused || !gameStarted) return;
 
@@ -309,26 +321,27 @@ canvas.addEventListener('click', (e) => {
                 enemy.removing = true
                 enemy.removeStartTime = Date.now()
                 if (point <= characterRadius) {
-                    console.log('들어옴')
                     score += 3 // 캐릭터의 파란 원 안에서 적을 처치하면 3점
                 } else {
                     score += 1 // 캐릭터의 파란 원 밖에서 적을 처치하면 1점
                 }
 
-                // if (score > 10 && stage === 1){
-                //     stage = 2
-                // } else if(score > 30 && stage === 2){
-                //     stage = 3
-                // }
+                if (score > 10 && stage === 1){
+                    stage = 2
+                    alphabets.push(..._alphabets)
+                } else if(score > 30 && stage === 2){
+                    stage = 3
+                    alphabets.push(..._alphabets2)
+                }
 
             } else {
                 enemy.clickedWrong = true
                 setTimeout(() => {
                     enemy.clickedWrong = false
                 }, 500)
-                lives -= 2
+                lives < 2 ? lives = 0 : lives -= 2
                 drawBoard()
-                if (lives <= 0) {
+                if (lives === 0) {
                     cancelAnimationFrame(enemyMovingAnimationFrame)
                     cancelAnimationFrame(characterMovingAnimationFrame)
                     alert('Game Over')
