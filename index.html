@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>스나이퍼</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        #canvas{
+            /* cursor: url('./public/Alternate-Select.cur'),auto; */
+            background-color: #eee;
+            cursor: url('./public/Percision-Select.ani'), auto;
+        }
+        #board-canvas{
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        #start-box {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            text-align: center;
+            max-width: 80%;
+        }
+        #start-box h2 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        #start-box h4 {
+            font-size: 20px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        #start-box ul {
+            list-style-type: none;
+            padding: 0;
+            text-align: left;
+        }
+        #start-box ul li {
+            margin-bottom: 10px;
+            font-size: 16px;
+            color: #555;
+            padding-left: 1em;
+            text-indent: -1em;
+        }
+        #start-box ul li span {
+            color: #007bff;
+        }
+        #start-box ul li .red {
+            color: red;
+        }
+        #start-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 18px;
+            color: white;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        #start-button:hover {
+            background-color: #0056b3;
+        }
+
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <canvas id="board-canvas"></canvas>
+    <div id="start-box">
+        <div>
+            <h2>알파벳 스나이퍼</h>
+            <h4>게임 방법</h4>
+            <ul>
+                <li>1. 마우스 우클릭으로 알파벳에서 도망가세요! <br>
+                    키보드로 알맞은 알파벳을 등록후 <br>
+                    몰려오는 알파벳을 마우스 왼쪽으로 클릭하세요!
+                </li>
+                <li>
+                    2. 캐릭터 범위 안에서 잡았을경우 <span>+3점</span> <br>
+                    밖에서 잡았을 경우는 <span>+1</span>점입니다.
+                </li>
+                <li>
+                    3. 정확한 클릭이 필요해요! <br>
+                    바닥을 잘못 클릭했을 경우 <span class="red">-1</span> <br>
+                    잘못된 알파벳을 클릭했을 경우 <span class="red">-2</span> <br>
+                    알파벳에 부딛혔을 경우 <span class="red">-3</span>
+                </li>
+                <li>
+                    4. 아 일시정지는 <strong>ESC</strong>, 정지 명령은 <strong>SPACE</strong> 잊지마세요!
+                </li>
+                <li>
+                    5. 그럼 행운을 빕니다!
+                </li>
+            </ul>
+        </div>
+        <button id="start-button">게임 시작</button>
+    </div>
+    <script src="sniper.js"></script>
+</body>
+</html>
