@@ -30,7 +30,7 @@ let character = {
     width: 50,
     height: 50,
     speed: 3,
-    range: 100,
+    range: 250,
     targetX: null,
     targetY: null,
     moving: false
@@ -297,18 +297,19 @@ canvas.addEventListener('click', (e) => {
         const distance = Math.sqrt(dx * dx + dy * dy)
 
         const cursorDx = mouseX - character.x
-        const cursorDy = mouseX - character.y
+        const cursorDy = mouseY - character.y
 
         const point = Math.sqrt(cursorDx * cursorDx + cursorDy * cursorDy)
         
         const characterRadius = character.width / 2 + character.range - 30 * (stage-1)
-
-        if (distance <= enemy.radius && !enemy.removing) {
+        if (distance <= enemy.radius && !enemy.removing) { // 지워지는 중이 아닌경우
+            // console.log(Math.floor(distance))
             enemyClicked = true
             if (enemy.alphabet === selectedAlphabet) {
                 enemy.removing = true
                 enemy.removeStartTime = Date.now()
                 if (point <= characterRadius) {
+                    console.log('들어옴')
                     score += 3 // 캐릭터의 파란 원 안에서 적을 처치하면 3점
                 } else {
                     score += 1 // 캐릭터의 파란 원 밖에서 적을 처치하면 1점
