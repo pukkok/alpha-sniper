@@ -28,3 +28,8 @@ https://pukkok.github.io/alpha-sniper
         </li>
     </ul>
 </div>
+
+<div>
+    게임 이미지
+    <img src="main-game.JPG" alt=""/>
+</div>

@@ -459,6 +459,7 @@ function reset () {
     lives = 10
     enemies = []
     alphabets = 'QWER'.split('')
+    selectedAlphabet = ''
     enemyRespawnInterval = 3000
     stringSec = 0
     
