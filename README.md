@@ -1,10 +1,7 @@
-"# alpha-sniper" 
-
-https://pukkok.github.io/alpha-sniper
+<h2>알파벳 스나이퍼 <a href='https://pukkok.github.io/alpha-sniper'>[게임하러가기]</a></h2>
 
 <div>
-    <h2>알파벳 스나이퍼</h2>
-    <h4>게임 방법</h4>
+    <blockquote>게임 방법</blockquote>
     <ol>
         <li>마우스 우클릭으로 알파벳에서 도망가세요! <br>
             키보드로 알맞은 알파벳을 등록후 <br>
@@ -28,8 +25,6 @@ https://pukkok.github.io/alpha-sniper
         </li>
     </ul>
 </div>
-
-
 
 ## 게임 이미지
 <div>
