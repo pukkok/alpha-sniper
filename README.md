@@ -3,7 +3,7 @@
 https://pukkok.github.io/alpha-sniper
 
 <div>
-    <h2>알파벳 스나이퍼</h>
+    <h2>알파벳 스나이퍼</h2>
     <h4>게임 방법</h4>
     <ol>
         <li>마우스 우클릭으로 알파벳에서 도망가세요! <br>
@@ -29,7 +29,11 @@ https://pukkok.github.io/alpha-sniper
     </ul>
 </div>
 
+
+
+## 게임 이미지
 <div>
-    게임 이미지
-    <img src="main-game.JPG" alt=""/>
+    <img width=800 src="public/extra/main-game.JPG" alt='' />&nbsp
 </div>
+
+
